@@ -1,4 +1,6 @@
 
+.PHONY: all run build config
+
 all: run
 
 run: build

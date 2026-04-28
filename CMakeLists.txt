@@ -14,7 +14,7 @@ add_subdirectory(vendored/SDL EXCLUDE_FROM_ALL)
 
 # Create your game executable target as usual
 set(C_SRC
-    ./src/hello.c
+    ./src/main.c
 )
 add_executable(mandelbrot ${C_SRC})
 
