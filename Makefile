@@ -4,9 +4,9 @@
 all: run
 
 run: build
-	@./build/mandelbrot
+	@./build/mandelbrot 2> out.log
 
-build: config
+build: 
 	@cmake --build build
 
 config:

@@ -15,8 +15,17 @@ add_subdirectory(vendored/SDL EXCLUDE_FROM_ALL)
 # Create your game executable target as usual
 set(C_SRC
     ./src/main.c
+    ./src/mandelbrot.c
 )
-add_executable(mandelbrot ${C_SRC})
+
+set(TARGET mandelbrot)
+
+add_executable(${TARGET} ${C_SRC})
 
 # Link to the actual SDL3 library.
-target_link_libraries(mandelbrot PRIVATE SDL3::SDL3)
+target_link_libraries(${TARGET} PRIVATE SDL3::SDL3)
+
+# Add include paths to target
+target_include_directories(${TARGET}
+    PRIVATE ./include
+)
