@@ -11,9 +11,9 @@
 #include <SDL3/SDL_main.h>
 #include "mandelbrot.h"
 
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 640
-#define ITERATIONS 500
+#define WINDOW_WIDTH 1000
+#define WINDOW_HEIGHT 1000
+#define ITERATIONS 1000
 
 /* We will use this renderer to draw into this window every frame. */
 static SDL_Window *window = NULL;
@@ -24,7 +24,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
     SDL_AppResult result = SDL_APP_FAILURE;
 
-    SDL_SetAppMetadata("Example Renderer Clear", "1.0", "com.example.renderer-clear");
+    SDL_SetAppMetadata("Mandelbrot Renderer", "1.0", "com.mandelbrot.renderer");
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
