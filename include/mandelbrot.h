@@ -4,39 +4,75 @@
 #include <stddef.h>
 
 //
-// Defines
+// Types -- Enums
 //
-#define WINDOW_WIDTH    640
-#define WINDOW_HEIGHT   640
-#define MANDELBROT_ITERATIONS   1000
+
+/**
+ * @brief Standard return types (PASS/FAIL) for Mandelbrot
+ * library operations
+ */
+typedef enum Mandelbrot_ReturnType
+{
+    E_NOT_OK,    /**< The result of the operation was a failure */
+    E_OK         /**< The result of the operation was a success */
+} Mandelbrot_ReturnType;
 
 //
-// Types
+// Types -- Structs
 //
-typedef struct Mandelbrot_View {
-    double center_x; /**< The central x coordinate of the view */
-    double center_y; /**< The central y coordinate of the view */
 
-    double plane[WINDOW_WIDTH][WINDOW_HEIGHT][3];
-} Mandelbrot_View;
+/**
+ * @brief Handle for Mandlebrot library state
+ */
+typedef struct Mandelbrot_Handle Mandelbrot_Handle;
 
-extern Mandelbrot_View state;
+/**
+ * @brief Container for the RGB values of a
+ * point/pixel in the Mandelbrot viewing window
+ */
+typedef struct Mandelbrot_Color
+{
+    double r; /**< The red channel value */
+    double g; /**< The green channel value */
+    double b; /**< The blue channel value */
+} Mandelbrot_Color;
 
 //
 // Function definitions
 //
 
 /**
- * @brief   Initialize the state of the mandelbrot view
+ * @brief Initialize the state of the mandelbrot view
+ * @param view_width The width of the Mandelbrot viewing window
+ * @param view_height The height of the Mandelbrot viewing window
+ * @param iterations The number of iterations to perform before
+ * deciding if a point is in the set
+ * @param segments The number of segments to divide the x and y
+ * axes into. Will spawn segments^2 number of threads during
+ * computation
+ * @retval E_OK Initialization succeeded
+ * @retval E_NOT_OK Initialization failed
  */
-void Mandelbrot_init(void);
+Mandelbrot_Handle* Mandelbrot_init(size_t view_width, size_t view_height,
+        size_t iterations, size_t segments);
 
 /**
- * @brief   Compute the values for a mandelbrot set
- * @param   iterations  The number of iterations to perform
+ * @brief Compute the values for a mandelbrot set
+ * @param handle A pointer to the Mandelbrot library handle
+ * @retval E_OK Computation succeeded
+ * @retval E_NOT_OK Computation failed
  */
-void Mandelbrot_compute(size_t x_min, size_t x_max, size_t y_min,
-        size_t y_max, size_t iterations);
+Mandelbrot_ReturnType Mandelbrot_compute(Mandelbrot_Handle* handle);
+
+/**
+ * @brief Gets a pointer to the color data struct for a point
+ * in the Mandelbrot view
+ * @param handle A pointer to the Mandelbrot library handle
+ * @param x The x coordinate of the window pixel
+ * @param y The y coordinate of the window pixel
+ */
+Mandelbrot_Color* Mandelbrot_getPointColor(Mandelbrot_Handle* handle,
+        size_t x, size_t y);
 
 #endif
 

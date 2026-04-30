@@ -11,6 +11,10 @@
 #include <SDL3/SDL_main.h>
 #include "mandelbrot.h"
 
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 640
+#define ITERATIONS 500
+
 /* We will use this renderer to draw into this window every frame. */
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
@@ -18,38 +22,58 @@ static SDL_Renderer *renderer = NULL;
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
+    SDL_AppResult result = SDL_APP_FAILURE;
+
     SDL_SetAppMetadata("Example Renderer Clear", "1.0", "com.example.renderer-clear");
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
+        return result;
     }
 
     if (!SDL_CreateWindowAndRenderer("examples/renderer/clear", 
                 WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer)) {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
+        return result;
     }
     SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-    Mandelbrot_init();
-    Mandelbrot_compute(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, MANDELBROT_ITERATIONS);
+    // Initialize the mandlebrot library
+    Mandelbrot_Handle* handle = Mandelbrot_init(
+            WINDOW_WIDTH, WINDOW_HEIGHT,
+            ITERATIONS, 4
+        );
 
-    return SDL_APP_CONTINUE;  /* carry on with the program! */
+    if (handle != NULL)
+    {
+        if (Mandelbrot_compute(handle) == E_OK)
+        {
+            result = SDL_APP_CONTINUE;
+            *appstate = (void*) handle;
+        }
+    }
+
+    return result;  /* carry on with the program! */
 }
 
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
+    // Continue program operation by default
+    SDL_AppResult result = SDL_APP_CONTINUE;
+
     if (event->type == SDL_EVENT_QUIT) {
-        return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
+        result = SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     }
-    return SDL_APP_CONTINUE;  /* carry on with the program! */
+    return result;
 }
 
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
+    SDL_AppResult result = SDL_APP_FAILURE;
+    Mandelbrot_Handle* handle = (Mandelbrot_Handle*) appstate;
+
     const uint64_t now = SDL_GetTicks();
     static uint64_t then = 0U;
 
@@ -72,22 +96,42 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     {
         for (size_t y = 0; y < WINDOW_HEIGHT; y++)
         {
-            SDL_SetRenderDrawColorFloat(
-                    renderer,
-                    state.plane[x][y][0],
-                    state.plane[x][y][1],
-                    state.plane[x][y][2],
-                    SDL_ALPHA_OPAQUE_FLOAT
-                );
+            Mandelbrot_Color* color = Mandelbrot_getPointColor(handle, x, y);
 
-            SDL_RenderPoint(renderer, x, y);
+            if (color != NULL)
+            {
+                SDL_SetRenderDrawColorFloat(
+                        renderer,
+                        color->r,
+                        color->g,
+                        color->b,
+                        SDL_ALPHA_OPAQUE_FLOAT
+                    );
+
+                SDL_RenderPoint(renderer, x, y);
+            }
+            else
+            {
+                break;
+            }
+
+            // If all points were successfully processed,
+            // then we can continue operation
+            if ((x == WINDOW_WIDTH - 1) && (y == WINDOW_HEIGHT - 1))
+            {
+                result = SDL_APP_CONTINUE;
+            }
+
         }
     }
 
     /* put the newly-cleared rendering on the screen. */
-    SDL_RenderPresent(renderer);
+    if (result == SDL_APP_CONTINUE)
+    {
+        SDL_RenderPresent(renderer);
+    }
 
-    return SDL_APP_CONTINUE;  /* carry on with the program! */
+    return result;  /* carry on with the program! */
 }
 
 /* This function runs once at shutdown. */
