@@ -70,9 +70,19 @@ Mandelbrot_ReturnType Mandelbrot_compute(Mandelbrot_Handle* handle);
  * @param handle A pointer to the Mandelbrot library handle
  * @param x The x coordinate of the window pixel
  * @param y The y coordinate of the window pixel
+ * @returns A pointer to the Mandelbrot color structure for the point,
+ * NULL if x or y is invalid/out of range
  */
 Mandelbrot_Color* Mandelbrot_getPointColor(Mandelbrot_Handle* handle,
         size_t x, size_t y);
+
+/**
+ * @brief Deallocates the Mandelbrot library instance
+ * @param handle A pointer to the Mandelbrot library handle
+ * @retval E_OK Deinitialization succeeded
+ * @retval E_NOT_OK Deinitialization failed
+ */
+Mandelbrot_ReturnType Mandelbrot_deinit(Mandelbrot_Handle* handle);
 
 #endif
 

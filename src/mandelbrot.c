@@ -21,6 +21,18 @@ struct Mandelbrot_Handle
                                view. Obtained after computation */
 };
 
+/**
+ * @brief The range of the Mandelbrot window a thread is responsible
+ * for computing
+ */
+typedef struct Mandelbrot_Range
+{
+    size_t x_min; /**< The min x value to start computation at */
+    size_t x_max; /**< The max x value to start computation at */
+    size_t y_min; /**< The min y value to start computation at */
+    size_t y_max; /**< The max y value to start computation at */
+} Mandelbrot_Range;
+
 //
 // Internal function prototypes
 //
@@ -32,6 +44,10 @@ struct Mandelbrot_Handle
  * @retval false The point is not in the Mandelbrot set
  */
 static bool Mandelbrot_point_in_set(Mandelbrot_Handle* handle, double complex c);
+
+//
+// Internal inline functions
+//
 
 /**
  * @brief Maps a coordinate scale into another
@@ -80,9 +96,38 @@ Mandelbrot_Handle* Mandelbrot_init(size_t view_width, size_t view_height,
     return handle;
 }
 
+Mandelbrot_ReturnType Mandelbrot_deinit(Mandelbrot_Handle* handle)
+{
+    Mandelbrot_ReturnType result = E_NOT_OK;
+
+    // Prevent deallocating a NULL pointer
+    if (handle == NULL)
+    {
+        return result;
+    }
+
+    // If plane data not NULL, then deallocate it
+    if (handle->plane != NULL)
+    {
+        free(handle->plane);
+    }
+
+    // Deallocate the state data
+    free(handle);
+
+    result = E_OK;
+    return result;
+}
+
 Mandelbrot_ReturnType Mandelbrot_compute(Mandelbrot_Handle* handle)
 {
     Mandelbrot_ReturnType result = E_NOT_OK;
+
+    // Prevent computation if handle not valid
+    if (handle == NULL)
+    {
+        return result;
+    }
 
     for (size_t x = 0; x < handle->view_width; x++)
     {
@@ -121,6 +166,12 @@ Mandelbrot_Color* Mandelbrot_getPointColor(Mandelbrot_Handle *handle, size_t x, 
 {
     Mandelbrot_Color* result = NULL;
 
+    // Prevent computation if handle not valid
+    if (handle == NULL)
+    {
+        return result;
+    }
+
     if ((0 <= x) && (x < handle->view_width) &&
         (0 <= y) && (y < handle->view_height))
     {
@@ -132,11 +183,16 @@ Mandelbrot_Color* Mandelbrot_getPointColor(Mandelbrot_Handle *handle, size_t x, 
 
 static bool Mandelbrot_point_in_set(Mandelbrot_Handle* handle, double complex c)
 {
-    double mag = 0.0f;
+    bool result = false;
+
+    if (handle == NULL)
+    {
+        return result;
+    }
 
     double complex z = 0.0f + (0.0f * I);
 
-    // z_(n+1) = z_n^2 + c
+    // Mandlebrot computation: z_(n+1) = z_n^2 + c
 
     for (size_t i = 0; i < handle->iterations; i++)
     {
@@ -147,10 +203,18 @@ static bool Mandelbrot_point_in_set(Mandelbrot_Handle* handle, double complex c)
         // the point is not in the set
         if (cabs(z) >= 2.0f)
         {
-            return false;
+            break;
+        }
+
+        // If we've reached the max number of iterations
+        // and the point has not diverged, mark it as in
+        // the set
+        if (i == (handle->iterations - 1))
+        {
+            result = true;
         }
     }
 
-    return true;
+    return result;
 }
 
