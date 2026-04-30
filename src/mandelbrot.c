@@ -53,10 +53,10 @@ typedef struct Mandelbrot_ThreadArg
 /**
  * @brief Determines if a point is in the Mandelbrot set or not
  * @param c A normalized complex coordinate
- * @retval true The point is in the Mandelbrot set
- * @retval false The point is not in the Mandelbrot set
+ * @returns The number of iterations spend on computation. If equal
+ * to handle->iterations, then the point is in the set
  */
-static bool Mandelbrot_point_in_set(Mandelbrot_Handle* handle, double complex c);
+static size_t Mandelbrot_point_in_set(Mandelbrot_Handle* handle, double complex c);
 
 /**
  * @brief Compute Mandelbrot values over a specific range. Used for multithreading
@@ -208,19 +208,10 @@ void* Mandelbrot_computeRangeWorker(void* arg)
             double complex c = x_scaled + (y_scaled * I);
 
             // If the point is in the set, shade it white
-            if (Mandelbrot_point_in_set(handle, c))
-            {
-                handle->plane[(x*handle->view_width) + y].r = 1.0f;
-                handle->plane[(x*handle->view_width) + y].g = 1.0f;
-                handle->plane[(x*handle->view_width) + y].b = 1.0f;
-            }
-            // Otherwise, shade it black
-            else
-            {
-                handle->plane[(x*handle->view_width) + y].r = 0.0f;
-                handle->plane[(x*handle->view_width) + y].g = 0.0f;
-                handle->plane[(x*handle->view_width) + y].b = 0.0f;
-            }
+            size_t iterations = Mandelbrot_point_in_set(handle, c);
+            handle->plane[(x*handle->view_width) + y].r = 1.0f - 20*((double)iterations / handle->iterations);
+            handle->plane[(x*handle->view_width) + y].g = 1.0f - 20*((double)iterations / handle->iterations);
+            handle->plane[(x*handle->view_width) + y].b = 1.0f - 20*((double)iterations / handle->iterations);
         }
     }
 
@@ -246,20 +237,19 @@ Mandelbrot_Color* Mandelbrot_getPointColor(Mandelbrot_Handle *handle, size_t x, 
     return result;
 }
 
-static bool Mandelbrot_point_in_set(Mandelbrot_Handle* handle, double complex c)
+static size_t Mandelbrot_point_in_set(Mandelbrot_Handle* handle, double complex c)
 {
-    bool result = false;
-
     if (handle == NULL)
     {
-        return result;
+        return handle->iterations;
     }
 
     double complex z = 0.0f + (0.0f * I);
 
     // Mandlebrot computation: z_(n+1) = z_n^2 + c
 
-    for (size_t i = 0; i < handle->iterations; i++)
+    size_t i;
+    for (i = 0; i < handle->iterations; i++)
     {
         // Calculate the next iteration
         z = cpow(z, 2) + c;
@@ -270,16 +260,8 @@ static bool Mandelbrot_point_in_set(Mandelbrot_Handle* handle, double complex c)
         {
             break;
         }
-
-        // If we've reached the max number of iterations
-        // and the point has not diverged, mark it as in
-        // the set
-        if (i == (handle->iterations - 1))
-        {
-            result = true;
-        }
     }
 
-    return result;
+    return i;
 }
 
