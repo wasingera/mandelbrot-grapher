@@ -87,10 +87,22 @@ Mandelbrot_ReturnType Mandelbrot_deinit(Mandelbrot_Handle* handle);
 /**
  * @brief Zooms the view by 2x on the mouse cursor
  * @param handle A pointer to the Mandelbrot library handle
+ * @param x The x coordinate, in pixels, of the mouse cursor
+ * @param y The y coordinate, in pixels, of the mouse cursor
  * @retval E_OK Deinitialization succeeded
  * @retval E_NOT_OK Deinitialization failed
  */
 Mandelbrot_ReturnType Mandelbrot_zoom(Mandelbrot_Handle* handle, size_t x, size_t y);
+
+/**
+ * @brief Zooms the view by 2x on the mouse cursor
+ * @param handle A pointer to the Mandelbrot library handle
+ * @param r_t The amount to shift along the real axis
+ * @param i_t The amount to shift along the imaginary axis
+ * @retval E_OK Deinitialization succeeded
+ * @retval E_NOT_OK Deinitialization failed
+ */
+Mandelbrot_ReturnType Mandelbrot_pan(Mandelbrot_Handle* handle, double r_t, double i_t);
 
 #endif
 
