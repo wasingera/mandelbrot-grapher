@@ -41,7 +41,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     // Initialize the mandlebrot library
     Mandelbrot_Handle* handle = Mandelbrot_init(
             WINDOW_WIDTH, WINDOW_HEIGHT,
-            ITERATIONS, 4
+            ITERATIONS, 8
         );
 
     if (handle != NULL)
@@ -62,8 +62,23 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
     // Continue program operation by default
     SDL_AppResult result = SDL_APP_CONTINUE;
 
+    Mandelbrot_Handle* handle = (Mandelbrot_Handle*) appstate;
+
     if (event->type == SDL_EVENT_QUIT) {
         result = SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
+    } else if (event->type == SDL_EVENT_KEY_DOWN)
+    {
+        if (event->key.key == SDLK_SPACE)
+        {
+            float x_pos, y_pos;
+            SDL_GetMouseState(&x_pos, &y_pos);
+
+            size_t x = (size_t) x_pos;
+            size_t y = (size_t) y_pos;
+
+            Mandelbrot_zoom(handle, x, y);
+            Mandelbrot_compute(handle);
+        }
     }
     return result;
 }

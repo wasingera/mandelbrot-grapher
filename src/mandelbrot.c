@@ -107,9 +107,15 @@ Mandelbrot_Handle* Mandelbrot_init(size_t view_width, size_t view_height,
         handle->plane = (Mandelbrot_Color*) malloc(
                 sizeof(Mandelbrot_Color) * view_height * view_width);
 
-        handle->plane_c_r = -0.75f;
-        handle->plane_c_i = 0.0f;
-        handle->plane_size = 1.25f;
+        // Main set view
+        // handle->plane_c_r = -0.75f;
+        // handle->plane_c_i = 0.0f;
+        // handle->plane_size = 1.25f;
+
+        // Seahorse valley
+        handle->plane_c_r = -.745;
+        handle->plane_c_i = .113;
+        handle->plane_size = .02;
 
         // If no memory for the plane data, then deallocate everything
         // and return NULL pointer
@@ -219,9 +225,9 @@ void* Mandelbrot_computeRangeWorker(void* arg)
 
             // If the point is in the set, shade it white
             size_t iterations = Mandelbrot_point_in_set(handle, c);
-            handle->plane[(x*handle->view_width) + y].r = 1.0f - 20*((double)iterations / handle->iterations);
-            handle->plane[(x*handle->view_width) + y].g = 1.0f - 20*((double)iterations / handle->iterations);
-            handle->plane[(x*handle->view_width) + y].b = 1.0f - 20*((double)iterations / handle->iterations);
+            handle->plane[(x*handle->view_width) + y].r = 1.0f - 2*((double)iterations / handle->iterations);
+            handle->plane[(x*handle->view_width) + y].g = 1.0f - 2*((double)iterations / handle->iterations);
+            handle->plane[(x*handle->view_width) + y].b = 1.0f - 2*((double)iterations / handle->iterations);
         }
     }
 
@@ -273,5 +279,33 @@ static size_t Mandelbrot_point_in_set(Mandelbrot_Handle* handle, double complex 
     }
 
     return i;
+}
+
+Mandelbrot_ReturnType Mandelbrot_zoom(Mandelbrot_Handle *handle, size_t x, size_t y)
+{
+    Mandelbrot_ReturnType result = E_NOT_OK;
+
+    if (handle == NULL)
+    {
+        return result;
+    }
+
+    double r_min_old = handle->plane_c_r - (handle->plane_size / 2);
+    double r_max_old = handle->plane_c_r + (handle->plane_size / 2);
+
+    double i_min_old = handle->plane_c_i - (handle->plane_size / 2);
+    double i_max_old = handle->plane_c_i + (handle->plane_size / 2);
+
+    double c_r_new = Mandelbrot_map_range(x, 0, handle->view_width - 1, r_min_old, r_max_old);
+    double c_i_new = Mandelbrot_map_range(y, 0, handle->view_height - 1, i_min_old, i_max_old);
+
+    double plane_size_new = handle->plane_size / 2.0f;
+
+    handle->plane_c_r = c_r_new;
+    handle->plane_c_i = c_i_new;
+    handle->plane_size = plane_size_new;
+
+    result = E_OK;
+    return result;
 }
 

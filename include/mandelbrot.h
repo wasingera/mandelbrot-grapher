@@ -84,5 +84,13 @@ Mandelbrot_Color* Mandelbrot_getPointColor(Mandelbrot_Handle* handle,
  */
 Mandelbrot_ReturnType Mandelbrot_deinit(Mandelbrot_Handle* handle);
 
+/**
+ * @brief Zooms the view by 2x on the mouse cursor
+ * @param handle A pointer to the Mandelbrot library handle
+ * @retval E_OK Deinitialization succeeded
+ * @retval E_NOT_OK Deinitialization failed
+ */
+Mandelbrot_ReturnType Mandelbrot_zoom(Mandelbrot_Handle* handle, size_t x, size_t y);
+
 #endif
 
