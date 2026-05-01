@@ -27,11 +27,14 @@ typedef struct Mandelbrot_Range
  */
 struct Mandelbrot_Handle
 {
-    size_t view_width;  /**< The width of the Mandelbrot view. (0,0) is top left */
-    size_t view_height; /**< The height of the Mandelbrot view. (0,0) is top left */
+    size_t view_width;  /**< The width of the Mandelbrot view in pixels. (0,0) is top left */
+    size_t view_height; /**< The height of the Mandelbrot view in pixels. (0,0) is top left */
     size_t iterations;  /**< The number of iterations to run before deciding if a
                           point is in the set */
     size_t segments;    /**< The number of segments to split x and y axes into */
+    double plane_c_r; /**< The center real coordinate of the complex plane */
+    double plane_c_i; /**< The center imaginary coordinate of the complex plane */
+    double plane_size; /**< The "radius" of the complex plane to compute */
     Mandelbrot_Color *plane; /**< The color data for each point in the Mandelbrot
                                view. Obtained after computation */
 };
@@ -103,6 +106,10 @@ Mandelbrot_Handle* Mandelbrot_init(size_t view_width, size_t view_height,
         handle->segments = segments;
         handle->plane = (Mandelbrot_Color*) malloc(
                 sizeof(Mandelbrot_Color) * view_height * view_width);
+
+        handle->plane_c_r = -0.75f;
+        handle->plane_c_i = 0.0f;
+        handle->plane_size = 1.25f;
 
         // If no memory for the plane data, then deallocate everything
         // and return NULL pointer
@@ -200,10 +207,13 @@ void* Mandelbrot_computeRangeWorker(void* arg)
         for (size_t y = range->y_min; y < range->y_max; y++)
         {
             // Convert the viewing window into abstract coordinates
-            double x_scaled = Mandelbrot_map_range(x, 0,
-                    handle->view_width - 1, -2.0f, 0.5f);
-            double y_scaled = Mandelbrot_map_range(y, 
-                    handle->view_height - 1, 0, -1.25, 1.25);
+            double x_scaled = Mandelbrot_map_range(x,
+                    0, handle->view_width - 1,
+                    handle->plane_c_r - handle->plane_size, handle->plane_c_r + handle->plane_size);
+
+            double y_scaled = Mandelbrot_map_range(y,
+                    0, handle->view_width - 1,
+                    handle->plane_c_i - handle->plane_size, handle->plane_c_i + handle->plane_size);
 
             double complex c = x_scaled + (y_scaled * I);
 
