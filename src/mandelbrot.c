@@ -1,5 +1,7 @@
 #include "mandelbrot.h"
+#include "SDL3/SDL_stdinc.h"
 #include <SDL3/SDL.h>
+#include <math.h>
 
 #include <stdbool.h>
 #include <complex.h>
@@ -108,14 +110,14 @@ Mandelbrot_Handle* Mandelbrot_init(size_t view_width, size_t view_height,
                 sizeof(Mandelbrot_Color) * view_height * view_width);
 
         // Main set view
-        // handle->plane_c_r = -0.75f;
-        // handle->plane_c_i = 0.0f;
-        // handle->plane_size = 1.25f;
+        handle->plane_c_r = -0.75f;
+        handle->plane_c_i = 0.0f;
+        handle->plane_size = 1.25f;
 
         // Seahorse valley
-        handle->plane_c_r = -.745;
-        handle->plane_c_i = .113;
-        handle->plane_size = .02;
+        // handle->plane_c_r = -.745;
+        // handle->plane_c_i = .113;
+        // handle->plane_size = .02;
 
         // If no memory for the plane data, then deallocate everything
         // and return NULL pointer
@@ -225,9 +227,16 @@ void* Mandelbrot_computeRangeWorker(void* arg)
 
             // If the point is in the set, shade it white
             size_t iterations = Mandelbrot_point_in_set(handle, c);
-            handle->plane[(x*handle->view_width) + y].r = 1.0f - 2*((double)iterations / handle->iterations);
-            handle->plane[(x*handle->view_width) + y].g = 1.0f - 2*((double)iterations / handle->iterations);
-            handle->plane[(x*handle->view_width) + y].b = 1.0f - 2*((double)iterations / handle->iterations);
+            handle->plane[(x*handle->view_width) + y].r = log(iterations + 1.0f) / log(handle->iterations);
+            handle->plane[(x*handle->view_width) + y].g = log(iterations + 1.0f) / log(handle->iterations);
+            handle->plane[(x*handle->view_width) + y].b = log(iterations + 1.0f) / log(handle->iterations);
+
+            if (iterations == handle->iterations)
+            {
+                handle->plane[(x*handle->view_width) + y].r = 0.0f;
+                handle->plane[(x*handle->view_width) + y].g = 0.0f;
+                handle->plane[(x*handle->view_width) + y].b = 0.0f;
+            }
         }
     }
 
@@ -290,20 +299,44 @@ Mandelbrot_ReturnType Mandelbrot_zoom(Mandelbrot_Handle *handle, size_t x, size_
         return result;
     }
 
-    double r_min_old = handle->plane_c_r - (handle->plane_size / 2);
-    double r_max_old = handle->plane_c_r + (handle->plane_size / 2);
+    double r_min_old = handle->plane_c_r - (handle->plane_size);
+    double r_max_old = handle->plane_c_r + (handle->plane_size);
 
-    double i_min_old = handle->plane_c_i - (handle->plane_size / 2);
-    double i_max_old = handle->plane_c_i + (handle->plane_size / 2);
+    double i_min_old = handle->plane_c_i - (handle->plane_size);
+    double i_max_old = handle->plane_c_i + (handle->plane_size);
 
     double c_r_new = Mandelbrot_map_range(x, 0, handle->view_width - 1, r_min_old, r_max_old);
     double c_i_new = Mandelbrot_map_range(y, 0, handle->view_height - 1, i_min_old, i_max_old);
 
-    double plane_size_new = handle->plane_size / 2.0f;
+    double plane_size_new = handle->plane_size / 3.0f;
 
     handle->plane_c_r = c_r_new;
     handle->plane_c_i = c_i_new;
     handle->plane_size = plane_size_new;
+
+    result = E_OK;
+    return result;
+}
+
+Mandelbrot_ReturnType Mandelbrot_pan(Mandelbrot_Handle* handle, double r_t, double i_t)
+{
+    Mandelbrot_ReturnType result = E_NOT_OK;
+
+    if (handle == NULL)
+    {
+        return result;
+    }
+
+    double x_scaled = Mandelbrot_map_range(r_t,
+            0, handle->view_width - 1,
+            handle->plane_c_r - handle->plane_size, handle->plane_c_r + handle->plane_size);
+
+    double y_scaled = Mandelbrot_map_range(r_t,
+            0, handle->view_width - 1,
+            handle->plane_c_i - handle->plane_size, handle->plane_c_i + handle->plane_size);
+
+    handle->plane_c_r += r_t * .125 * handle->plane_size;
+    handle->plane_c_i += i_t * .125 * handle->plane_size;
 
     result = E_OK;
     return result;
