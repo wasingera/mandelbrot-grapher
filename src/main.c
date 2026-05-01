@@ -68,15 +68,32 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         result = SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     } else if (event->type == SDL_EVENT_KEY_DOWN)
     {
+        float x_pos, y_pos;
+        SDL_GetMouseState(&x_pos, &y_pos);
+
         if (event->key.key == SDLK_SPACE)
         {
-            float x_pos, y_pos;
-            SDL_GetMouseState(&x_pos, &y_pos);
 
             size_t x = (size_t) x_pos;
             size_t y = (size_t) y_pos;
 
             Mandelbrot_zoom(handle, x, y);
+            Mandelbrot_compute(handle);
+        } else if (event->key.key == SDLK_DOWN)
+        {
+            Mandelbrot_pan(handle, 0.0f, 1.0f);
+            Mandelbrot_compute(handle);
+        } else if (event->key.key == SDLK_UP)
+        {
+            Mandelbrot_pan(handle, 0.0f, -1.0f);
+            Mandelbrot_compute(handle);
+        } else if (event->key.key == SDLK_LEFT)
+        {
+            Mandelbrot_pan(handle, -1.0f, 0.0f);
+            Mandelbrot_compute(handle);
+        } else if (event->key.key == SDLK_RIGHT)
+        {
+            Mandelbrot_pan(handle, 1.0f, 0.0f);
             Mandelbrot_compute(handle);
         }
     }

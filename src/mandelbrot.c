@@ -327,8 +327,16 @@ Mandelbrot_ReturnType Mandelbrot_pan(Mandelbrot_Handle* handle, double r_t, doub
         return result;
     }
 
-    handle->plane_c_r += r_t;
-    handle->plane_c_i += i_t;
+    double x_scaled = Mandelbrot_map_range(r_t,
+            0, handle->view_width - 1,
+            handle->plane_c_r - handle->plane_size, handle->plane_c_r + handle->plane_size);
+
+    double y_scaled = Mandelbrot_map_range(r_t,
+            0, handle->view_width - 1,
+            handle->plane_c_i - handle->plane_size, handle->plane_c_i + handle->plane_size);
+
+    handle->plane_c_r += r_t * .125 * handle->plane_size;
+    handle->plane_c_i += i_t * .125 * handle->plane_size;
 
     result = E_OK;
     return result;
