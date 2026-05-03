@@ -1,5 +1,4 @@
 #include "mandelbrot.h"
-#include "SDL3/SDL_stdinc.h"
 #include <SDL3/SDL.h>
 #include <math.h>
 
