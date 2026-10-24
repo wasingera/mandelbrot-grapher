@@ -25,3 +25,7 @@ target_link_libraries(${APP_NAME}
     PRIVATE SDL3::SDL3  # SDL3 Graphics Lib
     PRIVATE mandelbrot
 )
+
+target_compile_options(${APP_NAME}
+    PRIVATE -Wall -Wextra
+)
