@@ -6,6 +6,7 @@ build/
 compile_commands.json
 *.log
 CMakeUserPresets.json
+.clangd
 
 # Prerequisites
 *.d
