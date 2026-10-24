@@ -10,7 +10,6 @@ set(INC
 
 set(INC_DIRS
     ./inc
-    ${PROJECT_ROOT}/mandelbrot/inc
 )
 
 add_executable(${APP_NAME}

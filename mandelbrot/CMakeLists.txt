@@ -18,7 +18,7 @@ add_library(${LIB_NAME}
 )
 
 target_include_directories(${LIB_NAME}
-    PRIVATE ${INC_DIRS}
+    PUBLIC ${INC_DIRS}
 )
 
 target_link_libraries(${LIB_NAME}
