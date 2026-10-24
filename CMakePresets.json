@@ -1,0 +1,58 @@
+{
+    "version": 12,
+    "cmakeMinimumRequired": {
+        "major": 4,
+        "minor": 4,
+        "patch": 4
+    },
+    "configurePresets": [
+        {
+            "name": "debug-base",
+            "displayName": "Base Debug Preset",
+            "description": "Base debug config using Ninja generator",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "release-base",
+            "displayName": "Base Release Preset",
+            "description": "Base release config using Ninja generator",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "debug-base",
+            "configurePreset": "debug-base"
+        },
+        {
+            "name": "release-base",
+            "configurePreset": "release-base"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "debug-base",
+            "configurePreset": "debug-base",
+            "execution": {
+                "stopOnFailure": true,
+                "noTestsAction": "error"
+            }
+        },
+        {
+            "name": "release-base",
+            "configurePreset": "release-base",
+            "execution": {
+                "stopOnFailure": true,
+                "noTestsAction": "error"
+            }
+        }
+    ]
+}
