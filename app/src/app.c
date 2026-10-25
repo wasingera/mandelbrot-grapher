@@ -19,6 +19,11 @@
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 
+static inline double translate_point(double p, double in_min, double in_max, double out_min, double out_max)
+{
+    return ((p - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
+}
+
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
@@ -69,9 +74,17 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         float x_pos, y_pos;
         SDL_GetMouseState(&x_pos, &y_pos);
 
+        double r_min = app_state->mandelbrot.c_r - (app_state->mandelbrot.scale / 2.0);
+        double r_max = app_state->mandelbrot.c_r + (app_state->mandelbrot.scale / 2.0);
+        double i_min = app_state->mandelbrot.c_i - (app_state->mandelbrot.scale / 2.0);
+        double i_max = app_state->mandelbrot.c_i + (app_state->mandelbrot.scale / 2.0);
+
+
         switch(event->key.key)
         {
             case SDLK_SPACE:
+                app_state->mandelbrot.c_r = translate_point(x_pos, 0, WINDOW_WIDTH, r_min, r_max);
+                app_state->mandelbrot.c_i = translate_point(y_pos, 0, WINDOW_HEIGHT, i_max, i_min);
                 app_state->mandelbrot.scale /= 2.0;
                 app_state->mandelbrot.update = true;
                 break;
