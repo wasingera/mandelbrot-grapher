@@ -164,9 +164,9 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 mandelbrot_result_t *result
                     = &app_state->mandelbrot.results[y][x]; 
 
-                app_state->pixels[x][y][0] = log(1.0f + result->iterations) / log(1000);
-                app_state->pixels[x][y][1] = log(1.0f + result->iterations) / log(1000);
-                app_state->pixels[x][y][2] = log(1.0f + result->iterations) / log(1000);
+                app_state->pixels[x][y][0] = log(1.0f + result->iterations) / log(MANDELBROT_MAX_ITERATIONS);
+                app_state->pixels[x][y][1] = log(1.0f + result->iterations) / log(MANDELBROT_MAX_ITERATIONS);
+                app_state->pixels[x][y][2] = log(1.0f + result->iterations) / log(MANDELBROT_MAX_ITERATIONS);
 
                 SDL_SetRenderDrawColorFloat(renderer,
                         app_state->pixels[x][y][0],
