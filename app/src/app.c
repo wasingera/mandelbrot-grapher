@@ -130,8 +130,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     }
     then = now;
 
-    mandelbrot_result_t *mandelbrot_results = malloc(sizeof(mandelbrot_result_t) * WINDOW_HEIGHT * WINDOW_WIDTH);
-
     if (app_state->mandelbrot.update)
     {
         // Clear the render buffer
@@ -149,8 +147,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 .i_min = app_state->mandelbrot.c_i - (app_state->mandelbrot.scale / 2.0),
                 .i_max = app_state->mandelbrot.c_i + (app_state->mandelbrot.scale / 2.0),
                 .max_iterations = 1000,
-                .out = mandelbrot_results,
-                .threads = 8
+                .out = (mandelbrot_result_t*)app_state->mandelbrot.results,
+                .threads = 0
                 });
 
     }
@@ -164,7 +162,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
             if (app_state->mandelbrot.update)
             {
                 mandelbrot_result_t *result
-                    = &mandelbrot_results[y*WINDOW_WIDTH + x];
+                    = &app_state->mandelbrot.results[y][x]; 
 
                 app_state->pixels[x][y][0] = log(1.0f + result->iterations) / log(1000);
                 app_state->pixels[x][y][1] = log(1.0f + result->iterations) / log(1000);
@@ -188,7 +186,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     }
 
     app_state->mandelbrot.update = false;
-    mandelbrot_free_results(mandelbrot_results);
 
     return result;  /* carry on with the program! */
 }
