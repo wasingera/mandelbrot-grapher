@@ -22,6 +22,9 @@ static SDL_Renderer *renderer = NULL;
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
+    (void)argc;
+    (void)argv;
+
     SDL_AppResult result = SDL_APP_CONTINUE;
 
     SDL_SetAppMetadata("Mandelbrot Renderer", "1.0", "com.mandelbrot.renderer");
@@ -54,7 +57,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
-    app_state_t *app_state = (app_state_t*)appstate;
+    (void)appstate;
 
     // Continue program operation by default
     SDL_AppResult result = SDL_APP_CONTINUE;
@@ -104,7 +107,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     }
     then = now;
 
-    mandelbrot_result_t* mandelbrot_results = NULL;
+    mandelbrot_result_t *mandelbrot_results = malloc(sizeof(mandelbrot_result_t) * WINDOW_HEIGHT * WINDOW_WIDTH);
+
     if (app_state->mandelbrot.update)
     {
         // Clear the render buffer
@@ -113,7 +117,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         SDL_RenderClear(renderer);
 
         SDL_Log("Updating...\n");
-        mandelbrot_results = mandelbrot_run(&(mandelbrot_run_params_t){
+
+        mandelbrot_run(&(mandelbrot_run_params_t){
                 .result_height = WINDOW_HEIGHT,
                 .result_width  = WINDOW_WIDTH,
                 .r_min = app_state->mandelbrot.c_r - (WINDOW_WIDTH / 2.0)*app_state->mandelbrot.scale,
@@ -121,7 +126,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 .i_min = app_state->mandelbrot.c_i - (WINDOW_HEIGHT / 2.0)*app_state->mandelbrot.scale,
                 .i_max = app_state->mandelbrot.c_i + (WINDOW_HEIGHT / 2.0)*app_state->mandelbrot.scale,
                 .max_iterations = 1000
-                });
+                }, mandelbrot_results);
 
     }
 
@@ -166,6 +171,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 /* This function runs once at shutdown. */
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
+    (void)result;
+
     app_state_t *app_state = (app_state_t*)appstate;
 
     /* SDL will clean up the window/renderer for us. */
