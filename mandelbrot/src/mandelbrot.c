@@ -5,12 +5,14 @@
 #include "mandelbrot_kernel.h"
 #endif
 
+#ifndef CUDA_EN
 //
 // Tests if a point is in the mandelbrot set
 //
 static mandelbrot_result_t mandelbrot_test_point(double c_r, double c_i, size_t max_iterations);
 
 static void* mandelbrot_worker(void* arg);
+#endif
 
 void mandelbrot_run(mandelbrot_run_params_t* params)
 {
@@ -57,6 +59,7 @@ void mandelbrot_run(mandelbrot_run_params_t* params)
 #endif
 }
 
+#ifndef CUDA_EN
 static void* mandelbrot_worker(void* arg)
 {
     mandelbrot_run_params_t *params = (mandelbrot_run_params_t*)arg;
@@ -133,3 +136,5 @@ static mandelbrot_result_t mandelbrot_test_point(double c_r, double c_i, size_t 
 
     return result;
 }
+#endif
+
