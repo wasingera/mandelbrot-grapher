@@ -27,7 +27,7 @@ target_include_directories(${LIB_NAME}
 )
 
 target_link_libraries(${LIB_NAME}
-    PUBLIC CUDA::cudart
+
 )
 
 target_compile_options(${LIB_NAME}
@@ -37,5 +37,9 @@ target_compile_options(${LIB_NAME}
 if(CUDAToolkit_FOUND)
     target_compile_definitions(${LIB_NAME}
         PUBLIC CUDA_EN
+    )
+
+    target_link_libraries(${LIB_NAME}
+        PUBLIC CUDA::cudart
     )
 endif()
