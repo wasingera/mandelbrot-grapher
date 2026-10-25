@@ -9,6 +9,8 @@
 
 #define MANDELBROT_THREADS          (0U)
 #define MANDELBROT_MAX_ITERATIONS   (1000U)
+#define MANDELBROT_ZOOM_FACTOR      (2.0)
+#define MANDELBROT_PAN_FACTOR       (10.0)
 
 typedef struct mandelbrot_state_t {
     double c_r;

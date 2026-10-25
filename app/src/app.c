@@ -74,10 +74,14 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         float x_pos, y_pos;
         SDL_GetMouseState(&x_pos, &y_pos);
 
-        double r_min = app_state->mandelbrot.c_r - (app_state->mandelbrot.scale / 2.0);
-        double r_max = app_state->mandelbrot.c_r + (app_state->mandelbrot.scale / 2.0);
-        double i_min = app_state->mandelbrot.c_i - (app_state->mandelbrot.scale / 2.0);
-        double i_max = app_state->mandelbrot.c_i + (app_state->mandelbrot.scale / 2.0);
+        double r_min =
+            app_state->mandelbrot.c_r - (app_state->mandelbrot.scale / MANDELBROT_ZOOM_FACTOR);
+        double r_max =
+            app_state->mandelbrot.c_r + (app_state->mandelbrot.scale / MANDELBROT_ZOOM_FACTOR);
+        double i_min =
+            app_state->mandelbrot.c_i - (app_state->mandelbrot.scale / MANDELBROT_ZOOM_FACTOR);
+        double i_max =
+            app_state->mandelbrot.c_i + (app_state->mandelbrot.scale / MANDELBROT_ZOOM_FACTOR);
 
 
         switch(event->key.key)
@@ -89,19 +93,19 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
                 app_state->mandelbrot.update = true;
                 break;
             case SDLK_DOWN:
-                app_state->mandelbrot.c_i -= app_state->mandelbrot.scale / 10.0f;
+                app_state->mandelbrot.c_i -= app_state->mandelbrot.scale / MANDELBROT_PAN_FACTOR;
                 app_state->mandelbrot.update = true;
                 break;
             case SDLK_UP:
-                app_state->mandelbrot.c_i += app_state->mandelbrot.scale / 10.0f;
+                app_state->mandelbrot.c_i += app_state->mandelbrot.scale / MANDELBROT_PAN_FACTOR;
                 app_state->mandelbrot.update = true;
                 break;
             case SDLK_LEFT:
-                app_state->mandelbrot.c_r -= app_state->mandelbrot.scale / 10.0f;
+                app_state->mandelbrot.c_r -= app_state->mandelbrot.scale / MANDELBROT_PAN_FACTOR;
                 app_state->mandelbrot.update = true;
                 break;
             case SDLK_RIGHT:
-                app_state->mandelbrot.c_r += app_state->mandelbrot.scale / 10.0f;
+                app_state->mandelbrot.c_r += app_state->mandelbrot.scale / MANDELBROT_PAN_FACTOR;
                 app_state->mandelbrot.update = true;
                 break;
             default:
