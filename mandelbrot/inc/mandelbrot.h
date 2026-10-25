@@ -49,11 +49,6 @@ typedef struct mandelbrot_run_params_t {
 // Functions
 //
 
-static inline void mandelbrot_free_results(mandelbrot_result_t* results)
-{
-    free(results);
-}
-
 //
 // Run the Mandelbrot solver
 //
@@ -64,6 +59,7 @@ static inline void mandelbrot_free_results(mandelbrot_result_t* results)
 //      `mandelbrot_result_t[params->width * params->height]`
 //
 //          Returned in row-major order (i.e. address with y*width + x)
+//
 void mandelbrot_run(mandelbrot_run_params_t* params);
 
 
