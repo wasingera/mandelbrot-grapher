@@ -4,7 +4,7 @@
 
 #define DIV_UP(a, b) (((a) + (b) - 1) / (b))
 
-__global__ void mandelbrot_worker_kernel(mandelbrot_run_params_t* params);
+__global__ void mandelbrot_worker_kernel(mandelbrot_run_params_t params);
 __device__ static mandelbrot_result_t mandelbrot_device_test_point(double c_r, double c_i, size_t max_iterations);
 
 void mandelbrot_run_kernel(mandelbrot_run_params_t* params)
@@ -12,35 +12,35 @@ void mandelbrot_run_kernel(mandelbrot_run_params_t* params)
     dim3 block(16,16);
     dim3 grid(DIV_UP(params->out_x_size, block.x), DIV_UP(params->out_y_size, block.y));
 
-    mandelbrot_worker_kernel<<<grid, block>>>(params);
+    mandelbrot_worker_kernel<<<grid, block>>>(*params);
 
     cudaDeviceSynchronize();
 }
 
-__global__ void mandelbrot_worker_kernel(mandelbrot_run_params_t* params)
+__global__ void mandelbrot_worker_kernel(mandelbrot_run_params_t params)
 {
 
     const size_t x = blockIdx.x * blockDim.x + threadIdx.x;
     const size_t y = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if ((x >= params->out_x_size) || (y >= params->out_y_size))
+    if ((x >= params.out_x_size) || (y >= params.out_y_size))
     {
         return;
     }
 
-    const size_t width = params->out_x_size;
-    const size_t height = params->out_y_size;
+    const size_t width = params.out_x_size;
+    const size_t height = params.out_y_size;
 
     // The step to take in coordinate space between each
     // entry in the result array
-    const double r_step = (double)(params->r_max - params->r_min) / (double)width;
-    const double i_step = (double)(params->i_max - params->i_min) / (double)height;
+    const double r_step = (double)(params.r_max - params.r_min) / (double)width;
+    const double i_step = (double)(params.i_max - params.i_min) / (double)height;
 
-    double r = params->r_min + (x*r_step);
-    double i = params->i_max - (y*i_step);
+    double r = params.r_min + (x*r_step);
+    double i = params.i_max - (y*i_step);
 
-    params->out[y*width + x] =
-        mandelbrot_device_test_point(r, i, params->max_iterations);
+    params.out[y*width + x] =
+        mandelbrot_device_test_point(r, i, params.max_iterations);
 }
 
 __device__ static mandelbrot_result_t mandelbrot_device_test_point(double c_r, double c_i, size_t max_iterations)
