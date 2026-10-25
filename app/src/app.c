@@ -141,7 +141,9 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 0, 0, SDL_ALPHA_OPAQUE_FLOAT);  /* new color, full alpha. */
         SDL_RenderClear(renderer);
 
+#ifndef NDEBUG
         SDL_Log("Updating...\n");
+#endif
 
         mandelbrot_run(&(mandelbrot_run_params_t){
                 .out_x_size  = WINDOW_WIDTH,
