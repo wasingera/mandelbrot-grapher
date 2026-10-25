@@ -15,6 +15,10 @@
 #include "mandelbrot.h"
 #include <math.h>
 
+#ifdef CUDA_EN
+#include <cuda_runtime_api.h>
+#endif
+
 /* We will use this renderer to draw into this window every frame. */
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
@@ -46,7 +50,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
     SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
+#ifdef CUDA_EN
+    app_state_t *app_state_init = NULL;
+    cudaMallocManaged((void*)&app_state_init, sizeof(app_state_t), cudaMemAttachGlobal);
+#else
     app_state_t *app_state_init = SDL_malloc(sizeof(app_state_t));
+#endif
 
     // Set to true so view is drawn on first render
     app_state_init->mandelbrot.update = true;
@@ -203,7 +212,12 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
 
     app_state_t *app_state = (app_state_t*)appstate;
 
-    /* SDL will clean up the window/renderer for us. */
+#ifdef CUDA_EN
+    cudaFree(app_state);
+#else
     SDL_free(app_state);
+#endif
+
+    /* SDL will clean up the window/renderer for us. */
 }
 
