@@ -1,15 +1,16 @@
 set(APP_NAME app)
 
 set(SRC
-    ./src/main.c
+    ./src/app.c
 )
 
 set(INC
-
+    ./inc/app_defs.h
 )
 
 set(INC_DIRS
     ./inc
+    ${PROJECT_ROOT}/mandelbrot/inc
 )
 
 add_executable(${APP_NAME}
@@ -23,7 +24,6 @@ target_include_directories(${APP_NAME}
 
 target_link_libraries(${APP_NAME}
     PRIVATE SDL3::SDL3  # SDL3 Graphics Lib
-    PRIVATE mandelbrot
 )
 
 target_compile_options(${APP_NAME}
