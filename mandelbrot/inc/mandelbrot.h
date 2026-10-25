@@ -13,23 +13,6 @@
 // Types -- Structs
 //
 
-typedef struct mandelbrot_run_params_t {
-    // Function parameters
-    double r_min; // Lower X bound of view
-    double r_max; // Upper X bound of view
-    double i_min; // Lower Y bound of view
-    double i_max; // Upper Y bound of view
-
-    // Output parameters
-    size_t result_width;  // X size of result array
-    size_t result_height; // Y size of result array
-
-    // Bounding parameters
-    size_t max_iterations; // Maximum number of iterations to compute
-                           // on a point before making a in/out of bounds
-                           // decision
-} mandelbrot_run_params_t;
-
 typedef struct mandelbrot_result_t {
     bool in_set;        // Boolean determining if point is in the Mandelbrot set
 
@@ -38,6 +21,29 @@ typedef struct mandelbrot_result_t {
                         //
                         // Else, `SIZE_MAX`.
 } mandelbrot_result_t;
+
+typedef struct mandelbrot_run_params_t {
+    // Function parameters
+    double r_min; // Lower X bound of view
+    double r_max; // Upper X bound of view
+    double i_min; // Lower Y bound of view
+    double i_max; // Upper Y bound of view
+
+
+    // Bounding parameters
+    size_t max_iterations; // Maximum number of iterations to compute
+                           // on a point before making a in/out of bounds
+                           // decision
+
+    size_t threads; // Number of threads to use for computation.
+                    // 0 to run all computation on main thread
+
+    // Output parameters
+    size_t result_width;  // X size of result array
+    size_t result_height; // Y size of result array
+    mandelbrot_result_t* out; // Buffer to store results in
+} mandelbrot_run_params_t;
+
 
 //
 // Functions
@@ -58,7 +64,7 @@ static inline void mandelbrot_free_results(mandelbrot_result_t* results)
 //      `mandelbrot_result_t[params->width * params->height]`
 //
 //          Returned in row-major order (i.e. address with y*width + x)
-void mandelbrot_run(mandelbrot_run_params_t* params, mandelbrot_result_t* out);
+void mandelbrot_run(mandelbrot_run_params_t* params);
 
 
 #endif

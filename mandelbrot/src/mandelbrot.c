@@ -1,12 +1,45 @@
 #include "mandelbrot.h"
+#include <pthread.h>
 
 //
 // Tests if a point is in the mandelbrot set
 //
 static mandelbrot_result_t mandelbrot_test_point(double c_r, double c_i, size_t max_iterations);
 
-void mandelbrot_run(mandelbrot_run_params_t* params, mandelbrot_result_t* out)
+static void mandelbrot_worker(void* arg);
+
+void mandelbrot_run(mandelbrot_run_params_t* params)
 {
+    if (params->threads == 0)
+    {
+        mandelbrot_worker(params);
+        return;
+    }
+
+    const size_t thread_count   = params->threads;
+    const size_t thread_count_2 = params->threads / 2;
+
+
+    mandelbrot_run_params_t thread_params[thread_count];
+
+    double r_base_curr = params->r_min;
+    double i_base_curr = params->i_min;
+
+    const double r_step = (params->r_max - params->r_min) / thread_count;
+    const double i_step = (params->i_max - params->i_min) / thread_count;
+
+    for (size_t i = 0; i < thread_count_2; i++)
+    {
+        for (size_t j = 0; j < thread_count_2; j++)
+        {
+            thread_params[(i*thread_count_2) + j];
+        }
+    }
+}
+
+static void mandelbrot_worker(void* arg)
+{
+    mandelbrot_run_params_t *params = (mandelbrot_run_params_t*)arg;
 
     const size_t width = params->result_width;
     const size_t height = params->result_height;
@@ -29,7 +62,8 @@ void mandelbrot_run(mandelbrot_run_params_t* params, mandelbrot_result_t* out)
             // 2 3 4 5
             //
             // y*width + x stores rows in table contiguously
-            out[y*width + x] = mandelbrot_test_point(curr_r, curr_i, params->max_iterations);
+            params->out[y*width + x] =
+                mandelbrot_test_point(curr_r, curr_i, params->max_iterations);
 
             // Advance to the next row
             curr_i -= step_i;
