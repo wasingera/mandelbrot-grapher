@@ -1,5 +1,8 @@
 #include "mandelbrot.h"
 
+//
+// Tests if a point is in the mandelbrot set
+//
 static mandelbrot_result_t mandelbrot_test_point(double c_r, double c_i, size_t max_iterations);
 
 void mandelbrot_run(mandelbrot_run_params_t* params, mandelbrot_result_t* out)
@@ -38,9 +41,6 @@ void mandelbrot_run(mandelbrot_run_params_t* params, mandelbrot_result_t* out)
     }
 }
 
-//
-// Tests if a point is in the mandelbrot set
-//
 static mandelbrot_result_t mandelbrot_test_point(double c_r, double c_i, size_t max_iterations)
 {
     mandelbrot_result_t result = {.iterations = max_iterations};
