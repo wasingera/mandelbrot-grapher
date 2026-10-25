@@ -144,8 +144,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         SDL_Log("Updating...\n");
 
         mandelbrot_run(&(mandelbrot_run_params_t){
-                .result_height = WINDOW_HEIGHT,
-                .result_width  = WINDOW_WIDTH,
+                .out_x_size  = WINDOW_WIDTH,
+                .out_y_size  = WINDOW_HEIGHT,
                 .r_min = app_state->mandelbrot.c_r - (app_state->mandelbrot.scale / 2.0),
                 .r_max = app_state->mandelbrot.c_r + (app_state->mandelbrot.scale / 2.0),
                 .i_min = app_state->mandelbrot.c_i - (app_state->mandelbrot.scale / 2.0),

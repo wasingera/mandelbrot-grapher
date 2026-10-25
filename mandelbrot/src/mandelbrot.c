@@ -12,6 +12,13 @@ void mandelbrot_run(mandelbrot_run_params_t* params)
 {
     if (params->threads == 0)
     {
+        // Compute entire range on this thread
+        params->thread_out_x_start = 0;
+        params->thread_out_x_end   = params->out_x_size;
+
+        params->thread_out_y_start = 0;
+        params->thread_out_y_end   = params->out_y_size;
+
         mandelbrot_worker(params);
         return;
     }
@@ -19,7 +26,7 @@ void mandelbrot_run(mandelbrot_run_params_t* params)
     const size_t thread_count = params->threads;
 
     // Divide the window into vertical strips
-    const double r_step = (params->r_max - params->r_min) / thread_count;
+    const size_t x_step = params->out_x_size / thread_count;
 
     pthread_t threads[thread_count];
     mandelbrot_run_params_t thread_params[thread_count];
@@ -28,8 +35,11 @@ void mandelbrot_run(mandelbrot_run_params_t* params)
     {
         thread_params[i] = *params;
 
-        thread_params[i].r_min += i*r_step;
-        thread_params[i].r_max = thread_params[i].r_min + r_step;
+        thread_params[i].thread_out_x_start = i*x_step;
+        thread_params[i].thread_out_x_end   = (i == thread_count-1) ? params->out_x_size : (i+1)*x_step;
+
+        thread_params[i].thread_out_y_start = 0;
+        thread_params[i].thread_out_y_end   = thread_params[i].out_y_size;
         pthread_create(&threads[i], NULL, mandelbrot_worker, (void*)(&thread_params[i]));
     }
 
@@ -43,20 +53,22 @@ static void* mandelbrot_worker(void* arg)
 {
     mandelbrot_run_params_t *params = (mandelbrot_run_params_t*)arg;
 
-    const size_t width = params->result_width;
-    const size_t height = params->result_height;
+    const size_t width = params->out_x_size;
+    const size_t height = params->out_y_size;
 
     // The step to take in coordinate space between each
     // entry in the result array
-    const double step_r = (double)(params->r_max - params->r_min) / (double)width;
-    const double step_i = (double)(params->i_max - params->i_min) / (double)height;
+    const double r_step = (double)(params->r_max - params->r_min) / (double)width;
+    const double i_step = (double)(params->i_max - params->i_min) / (double)height;
 
-    double curr_r = params->r_min;
-    double curr_i = params->i_max;
+    double curr_r = params->r_min + (params->thread_out_x_start*r_step);
+    double curr_i = params->i_max - (params->thread_out_y_start*r_step);
 
-    for (size_t x = 0; x < params->result_width; x++)
+    const size_t x_start = params->thread_out_x_start, x_end = params->thread_out_x_end;
+    const size_t y_start = params->thread_out_y_start, y_end = params->thread_out_y_end;
+    for (size_t x = x_start; x < x_end; x++)
     {
-        for (size_t y = 0; y < params->result_height; y++)
+        for (size_t y = y_start; y < y_end; y++)
         {
             // 0 1 2 3
             // 4 5 6 7
@@ -68,12 +80,12 @@ static void* mandelbrot_worker(void* arg)
                 mandelbrot_test_point(curr_r, curr_i, params->max_iterations);
 
             // Advance to the next row
-            curr_i -= step_i;
+            curr_i -= i_step;
         }
 
         // Advance to the next column
         curr_i = params->i_max;
-        curr_r += step_r;
+        curr_r += r_step;
     }
 
     return NULL;

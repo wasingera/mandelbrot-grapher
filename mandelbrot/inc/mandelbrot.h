@@ -38,10 +38,16 @@ typedef struct mandelbrot_run_params_t {
     size_t threads; // Number of threads to use for computation.
                     // 0 to run all computation on main thread
 
-    // Output parameters
-    size_t result_width;  // X size of result array
-    size_t result_height; // Y size of result array
+    // In/out parameters
+    size_t out_x_size;  // X size of result array
+    size_t out_y_size; // Y size of result array
     mandelbrot_result_t* out; // Buffer to store results in
+
+    // Internal parameters -- modified by lib
+    size_t thread_out_x_start;
+    size_t thread_out_x_end;
+    size_t thread_out_y_start;
+    size_t thread_out_y_end;
 } mandelbrot_run_params_t;
 
 
