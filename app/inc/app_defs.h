@@ -7,6 +7,9 @@
 #define WINDOW_WIDTH    (1000U)
 #define WINDOW_HEIGHT   (1000U)
 
+#define MANDELBROT_THREADS          (0U)
+#define MANDELBROT_MAX_ITERATIONS   (1000U)
+
 typedef struct mandelbrot_state_t {
     double c_r;
     double c_i;
