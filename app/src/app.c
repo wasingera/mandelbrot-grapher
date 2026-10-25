@@ -89,7 +89,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
             case SDLK_SPACE:
                 app_state->mandelbrot.c_r = translate_point(x_pos, 0, WINDOW_WIDTH, r_min, r_max);
                 app_state->mandelbrot.c_i = translate_point(y_pos, 0, WINDOW_HEIGHT, i_max, i_min);
-                app_state->mandelbrot.scale /= 2.0;
+                app_state->mandelbrot.scale /= MANDELBROT_ZOOM_FACTOR;
                 app_state->mandelbrot.update = true;
                 break;
             case SDLK_DOWN:
