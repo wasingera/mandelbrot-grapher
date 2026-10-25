@@ -18,7 +18,7 @@ typedef struct mandelbrot_state_t {
     double scale;
     bool update;
 
-    mandelbrot_result_t results[WINDOW_HEIGHT][WINDOW_WIDTH];
+    mandelbrot_result_t *results;
 } mandelbrot_state_t;
 
 typedef struct app_state_t {

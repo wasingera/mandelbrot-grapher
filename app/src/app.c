@@ -50,11 +50,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
     SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-#ifdef CUDA_EN
-    app_state_t *app_state_init = NULL;
-    cudaMallocManaged((void*)&app_state_init, sizeof(app_state_t), cudaMemAttachGlobal);
-#else
     app_state_t *app_state_init = SDL_malloc(sizeof(app_state_t));
+#ifdef CUDA_EN
+    cudaMallocManaged((void*)&app_state_init->mandelbrot.results,
+            sizeof(mandelbrot_result_t)*WINDOW_WIDTH*WINDOW_HEIGHT, cudaMemAttachGlobal);
+#else
+    app_state_init->mandelbrot.results = SDL_malloc(sizeof(mandelbrot_result_t)*WINDOW_WIDTH*WINDOW_HEIGHT);
 #endif
 
     // Set to true so view is drawn on first render
@@ -177,7 +178,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
             if (app_state->mandelbrot.update)
             {
                 mandelbrot_result_t *result
-                    = &app_state->mandelbrot.results[y][x]; 
+                    = &app_state->mandelbrot.results[y*WINDOW_WIDTH + x]; 
 
                 app_state->pixels[x][y][0] = log(1.0f + result->iterations) / log(MANDELBROT_MAX_ITERATIONS);
                 app_state->pixels[x][y][1] = log(1.0f + result->iterations) / log(MANDELBROT_MAX_ITERATIONS);
@@ -213,8 +214,10 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
     app_state_t *app_state = (app_state_t*)appstate;
 
 #ifdef CUDA_EN
-    cudaFree(app_state);
+    cudaFree(app_state->mandelbrot.results);
+    SDL_free(app_state);
 #else
+    SDL_free(app_state->mandelbrot.results);
     SDL_free(app_state);
 #endif
 
