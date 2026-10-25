@@ -111,7 +111,7 @@ static mandelbrot_result_t* mandelbrot_run(mandelbrot_run_params_t* params)
     // The step to take in coordinate space between each
     // entry in the result array
     const double step_r = (double)(params->r_max - params->r_min) / (double)params->result_width;
-    const double step_i = (double)(params->i_max - params->i_min) / (double)params->result_width;
+    const double step_i = (double)(params->i_max - params->i_min) / (double)params->result_height;
 
     double curr_r = params->r_min;
     double curr_i = params->i_max;
