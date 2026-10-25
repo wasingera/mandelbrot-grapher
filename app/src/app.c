@@ -47,7 +47,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     app_state_init->mandelbrot.update = true;
     app_state_init->mandelbrot.c_r = -0.75;
     app_state_init->mandelbrot.c_i = -0.0;
-    app_state_init->mandelbrot.scale = 3.0 / WINDOW_HEIGHT;
+    app_state_init->mandelbrot.scale = 3.0;
 
     *appstate = app_state_init;
 
@@ -121,10 +121,10 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         mandelbrot_run(&(mandelbrot_run_params_t){
                 .result_height = WINDOW_HEIGHT,
                 .result_width  = WINDOW_WIDTH,
-                .r_min = app_state->mandelbrot.c_r - (WINDOW_WIDTH / 2.0)*app_state->mandelbrot.scale,
-                .r_max = app_state->mandelbrot.c_r + (WINDOW_WIDTH / 2.0)*app_state->mandelbrot.scale,
-                .i_min = app_state->mandelbrot.c_i - (WINDOW_HEIGHT / 2.0)*app_state->mandelbrot.scale,
-                .i_max = app_state->mandelbrot.c_i + (WINDOW_HEIGHT / 2.0)*app_state->mandelbrot.scale,
+                .r_min = app_state->mandelbrot.c_r - (app_state->mandelbrot.scale / 2.0),
+                .r_max = app_state->mandelbrot.c_r + (app_state->mandelbrot.scale / 2.0),
+                .i_min = app_state->mandelbrot.c_i - (app_state->mandelbrot.scale / 2.0),
+                .i_max = app_state->mandelbrot.c_i + (app_state->mandelbrot.scale / 2.0),
                 .max_iterations = 1000
                 }, mandelbrot_results);
 
