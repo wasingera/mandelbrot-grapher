@@ -89,12 +89,20 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
                 app_state->mandelbrot.update = true;
                 break;
             case SDLK_DOWN:
+                app_state->mandelbrot.c_i -= app_state->mandelbrot.scale / 10.0f;
+                app_state->mandelbrot.update = true;
                 break;
             case SDLK_UP:
+                app_state->mandelbrot.c_i += app_state->mandelbrot.scale / 10.0f;
+                app_state->mandelbrot.update = true;
                 break;
             case SDLK_LEFT:
+                app_state->mandelbrot.c_r -= app_state->mandelbrot.scale / 10.0f;
+                app_state->mandelbrot.update = true;
                 break;
             case SDLK_RIGHT:
+                app_state->mandelbrot.c_r += app_state->mandelbrot.scale / 10.0f;
+                app_state->mandelbrot.update = true;
                 break;
             default:
                 break;
