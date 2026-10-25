@@ -57,7 +57,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
-    (void)appstate;
+    app_state_t *app_state = (app_state_t*)appstate;
 
     // Continue program operation by default
     SDL_AppResult result = SDL_APP_CONTINUE;
@@ -72,6 +72,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         switch(event->key.key)
         {
             case SDLK_SPACE:
+                app_state->mandelbrot.scale /= 2.0;
+                app_state->mandelbrot.update = true;
                 break;
             case SDLK_DOWN:
                 break;
