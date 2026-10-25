@@ -6,7 +6,7 @@
 //
 static mandelbrot_result_t mandelbrot_test_point(double c_r, double c_i, size_t max_iterations);
 
-static void mandelbrot_worker(void* arg);
+static void* mandelbrot_worker(void* arg);
 
 void mandelbrot_run(mandelbrot_run_params_t* params)
 {
@@ -16,28 +16,30 @@ void mandelbrot_run(mandelbrot_run_params_t* params)
         return;
     }
 
-    const size_t thread_count   = params->threads;
-    const size_t thread_count_2 = params->threads / 2;
+    const size_t thread_count = params->threads;
 
+    // Divide the window into vertical strips
+    const double r_step = (params->r_max - params->r_min) / thread_count;
 
+    pthread_t threads[thread_count];
     mandelbrot_run_params_t thread_params[thread_count];
 
-    double r_base_curr = params->r_min;
-    double i_base_curr = params->i_min;
-
-    const double r_step = (params->r_max - params->r_min) / thread_count;
-    const double i_step = (params->i_max - params->i_min) / thread_count;
-
-    for (size_t i = 0; i < thread_count_2; i++)
+    for (size_t i = 0; i < thread_count; i++)
     {
-        for (size_t j = 0; j < thread_count_2; j++)
-        {
-            thread_params[(i*thread_count_2) + j];
-        }
+        thread_params[i] = *params;
+
+        thread_params[i].r_min += i*r_step;
+        thread_params[i].r_max = thread_params[i].r_min + r_step;
+        pthread_create(&threads[i], NULL, mandelbrot_worker, (void*)(&thread_params[i]));
+    }
+
+    for (size_t i = 0; i < thread_count; i++)
+    {
+        pthread_join(threads[i], NULL);
     }
 }
 
-static void mandelbrot_worker(void* arg)
+static void* mandelbrot_worker(void* arg)
 {
     mandelbrot_run_params_t *params = (mandelbrot_run_params_t*)arg;
 
@@ -73,6 +75,8 @@ static void mandelbrot_worker(void* arg)
         curr_i = params->i_max;
         curr_r += step_r;
     }
+
+    return NULL;
 }
 
 static mandelbrot_result_t mandelbrot_test_point(double c_r, double c_i, size_t max_iterations)

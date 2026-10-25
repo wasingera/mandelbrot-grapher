@@ -149,7 +149,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 .i_min = app_state->mandelbrot.c_i - (app_state->mandelbrot.scale / 2.0),
                 .i_max = app_state->mandelbrot.c_i + (app_state->mandelbrot.scale / 2.0),
                 .max_iterations = 1000,
-                .out = mandelbrot_results
+                .out = mandelbrot_results,
+                .threads = 8
                 });
 
     }
