@@ -13,6 +13,8 @@ void mandelbrot_run_kernel(mandelbrot_run_params_t* params)
     dim3 grid(DIV_UP(params->out_y_size, block.y), DIV_UP(params->out_x_size, block.x));
 
     mandelbrot_worker_kernel<<<grid, block>>>(params);
+
+    cudaDeviceSynchronize();
 }
 
 __global__ void mandelbrot_worker_kernel(mandelbrot_run_params_t* params)
