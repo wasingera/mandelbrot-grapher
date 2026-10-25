@@ -1,11 +1,11 @@
 set(APP_NAME app)
 
 set(SRC
-    ./src/main.c
+    ./src/app.c
 )
 
 set(INC
-
+    ./inc/app_defs.h
 )
 
 set(INC_DIRS
@@ -24,4 +24,9 @@ target_include_directories(${APP_NAME}
 target_link_libraries(${APP_NAME}
     PRIVATE SDL3::SDL3  # SDL3 Graphics Lib
     PRIVATE mandelbrot
+    PRIVATE m
+)
+
+target_compile_options(${APP_NAME}
+    PRIVATE -Wall -Wextra
 )

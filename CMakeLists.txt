@@ -4,6 +4,9 @@ project(mandelbrot)
 # Export compile commands
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Make compiler output colorful
+set(CMAKE_COLOR_DIAGNOSTICS ON)
+
 # Set project root for all submodules
 set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 

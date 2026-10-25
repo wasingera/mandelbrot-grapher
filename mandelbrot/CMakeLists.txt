@@ -22,5 +22,9 @@ target_include_directories(${LIB_NAME}
 )
 
 target_link_libraries(${LIB_NAME}
-    PRIVATE m   # C standard math lib
+
+)
+
+target_compile_options(${LIB_NAME}
+    PRIVATE -Wall -Wextra
 )
