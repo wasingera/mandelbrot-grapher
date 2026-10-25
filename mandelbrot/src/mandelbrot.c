@@ -1,6 +1,10 @@
 #include "mandelbrot.h"
 #include <pthread.h>
 
+#ifdef CUDA_EN
+#include "mandelbrot_kernel.h"
+#endif
+
 //
 // Tests if a point is in the mandelbrot set
 //
@@ -10,6 +14,9 @@ static void* mandelbrot_worker(void* arg);
 
 void mandelbrot_run(mandelbrot_run_params_t* params)
 {
+#ifdef CUDA_EN
+    mandelbrot_run_kernel(params);
+#else
     if (params->threads == 0)
     {
         // Compute entire range on this thread
@@ -47,6 +54,7 @@ void mandelbrot_run(mandelbrot_run_params_t* params)
     {
         pthread_join(threads[i], NULL);
     }
+#endif
 }
 
 static void* mandelbrot_worker(void* arg)
